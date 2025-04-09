@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tradução de Palavras - Corpo e Cores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+    .card {
+      background: #f9f9f9;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      display: inline-block;
+      min-width: 300px;
+    }
+    input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="portugues">Palavra em português</h2>
+    <input type="text" id="resposta" placeholder="Digite em inglês" />
+    <br />
+    <button onclick="verificarResposta()">Enviar</button>
+    <button onclick="ouvirPalavra()">🔊 Ouvir palavra</button>
+    <p id="mensagem"></p>
+  </div>
+
+  <script>
+    const palavras = [
+      { pt: "verde", en: "green" },
+      { pt: "marrom", en: "brown" },
+      { pt: "olhos", en: "eyes" },
+      { pt: "forte", en: "strong" },
+      { pt: "braços", en: "arms" },
+      { pt: "cabeça", en: "head" },
+      { pt: "nariz", en: "nose" },
+      { pt: "curto/pequeno", en: "short" },
+      { pt: "cabelo", en: "hair" },
+      { pt: "mão", en: "hand" },
+      { pt: "pescoço", en: "neck" },
+      { pt: "pernas", en: "legs" },
+      { pt: "dedos (da mão)", en: "fingers" },
+      { pt: "dedos (do pé)", en: "toes" },
+      { pt: "orelhas", en: "ears" },
+      { pt: "pés", en: "feet" },
+      { pt: "boca", en: "mouth" },
+      { pt: "fraco", en: "weak" },
+      { pt: "ombros", en: "shoulders" },
+      { pt: "joelhos", en: "knees" },
+      { pt: "fino/magro", en: "thin" }
+    ];
+
+    function embaralhar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    embaralhar(palavras);
+
+    let indice = 0;
+    let tentativas = 0;
+
+    function mostrarPalavra() {
+      document.getElementById("portugues").innerText = palavras[indice].pt;
+      document.getElementById("resposta").value = "";
+      document.getElementById("mensagem").innerText = "";
+      document.getElementById("resposta").focus();
+    }
+
+    function verificarResposta() {
+      const resposta = document.getElementById("resposta").value.trim().toLowerCase();
+      const correta = palavras[indice].en.toLowerCase();
+
+      if (resposta === correta) {
+        document.getElementById("mensagem").innerHTML = "<span class='correct'>Correto!</span>";
+        indice++;
+        tentativas = 0;
+        setTimeout(() => {
+          if (indice < palavras.length) {
+            mostrarPalavra();
+          } else {
+            document.querySelector(".card").innerHTML = "<h2>Você completou todas as palavras!</h2>";
+          }
+        }, 1000);
+      } else {
+        tentativas++;
+        if (tentativas === 1) {
+          document.getElementById("mensagem").innerHTML = "<span class='incorrect'>Tente novamente.</span>";
+        } else {
+          document.getElementById("mensagem").innerHTML = `<span class='incorrect'>A palavra correta é: <strong>${palavras[indice].en}</strong></span>`;
+          indice++;
+          tentativas = 0;
+          setTimeout(() => {
+            if (indice < palavras.length) {
+              mostrarPalavra();
+            } else {
+              document.querySelector(".card").innerHTML = "<h2>Você completou todas as palavras!</h2>";
+            }
+          }, 3000);
+        }
+      }
+    }
+
+    function ouvirPalavra() {
+      const utterance = new SpeechSynthesisUtterance(palavras[indice].en);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+
+    document.getElementById("resposta").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        verificarResposta();
+      }
+    });
+
+    mostrarPalavra();
+  </script>
+</body>
+</html>
